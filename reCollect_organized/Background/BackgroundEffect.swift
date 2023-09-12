@@ -56,7 +56,7 @@ struct Effect2: BackgroundEffect {
         // Example implementation:
         let range: CGFloat = 100.0 
         var xOffset = initialX // Initialize with the current X offset
-        let moveAmount: CGFloat = contentOffset.y/100 // Amount to move the background
+        let moveAmount: CGFloat = contentOffset.y/40 // Amount to move the background
 
 //        if contentOffset.y > 0 {
 //            // When scrolling down (positive content offset), move the background to the right
@@ -72,7 +72,7 @@ struct Effect2: BackgroundEffect {
     func calculateYOffset(for contentOffset: CGPoint, initialY: CGFloat) -> CGFloat {
         // Calculate the desired Y offset based on the content offset
         // Example implementation:
-        return initialY // No change in Y offset
+        return initialY + contentOffset.y/70 // No change in Y offset
     }
 }
 //

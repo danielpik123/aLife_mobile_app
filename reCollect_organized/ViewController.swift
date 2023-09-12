@@ -37,12 +37,12 @@ class ViewController: UIViewController {
         coordinator = Coordinator()
 
         // Transition to StartVC
-//        coordinator.transitionTo(handler: StartVC(view: view, viewController: self))
+        coordinator.transitionTo(handler: StartVC(view: view, viewController: self))
 //        // TODO: delete - * Change the VC hanler to generate it first
-        topBarManager.extendBar()
-        coordinator.transitionTo(handler: ChooseVC(view: view))
-        backgroundImageView.alpha = 1
-        topBarManager.animateOpacity(to: 1)
+//        topBarManager.extendBar()
+//        coordinator.transitionTo(handler: ChooseVC(view: view))
+//        backgroundImageView.alpha = 1
+//        topBarManager.animateOpacity(to: 1)
 
         // TODO: till here
 //        background?.changeZoom(newScale: 3, duration: 1)

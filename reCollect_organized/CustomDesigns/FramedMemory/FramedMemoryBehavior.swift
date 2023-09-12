@@ -88,7 +88,14 @@ extension FramedMemory {
         }
         self.objectAttached = false
         self.objedtInRightSpin = true
-        DataSet.shared.addApprovedPhotoData(photoLocation: self.localIdentifier , significanceValue: 1)
+        DataSet.shared.addApprovedPhotoData(photoLocation: self.localIdentifier , significanceValue: 1, image: self.imageView.image!)
+        FirebaseManager.shared.uploadPhoto(localIdentifier: self.localIdentifier, significanceRating: 1, image: self.imageView.image!) { error in
+            if let error = error {
+                print("Failed to upload photo: \(error.localizedDescription)")
+            } else {
+                print("Photo uploaded successfully!")
+            }
+        }
         DataSet.shared.shownPhotos.append(self.localIdentifier)
         animator.removeBehavior(attachment1)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
@@ -222,7 +229,7 @@ extension FramedMemory {
     
     func addNextButton(){
         let count = DataSet.shared.numberOfApprovedPhotos()
-        let enoughPhotos = count == 1
+        let enoughPhotos = count == 7
         
         if enoughPhotos {
             if ((self.behavior) != nil){
@@ -231,5 +238,4 @@ extension FramedMemory {
             }
         }
     }
-
 }

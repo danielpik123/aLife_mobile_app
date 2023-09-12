@@ -44,6 +44,8 @@ class Coordinator: ViewControllerHandlerDelegate {
             transitionTo(handler: ChooseVC(view: handler.view))
         } else if nextHandlerType is RateVC.Type {
             transitionTo(handler: RateVC(view: handler.view))
+        }  else if nextHandlerType is CompareVC.Type {
+            transitionTo(handler: CompareVC(view: handler.view))
         } else if nextHandlerType is TestLogicVC2.Type {
             transitionTo(handler: TestLogicVC2(view: handler.view))
         } else if nextHandlerType is TestLogicVC3.Type {

@@ -7,6 +7,7 @@
 
 import Foundation
 import Photos
+import UIKit
 
 class DataSet {
     static let shared = DataSet()
@@ -16,9 +17,14 @@ class DataSet {
 
     public var shownPhotos: [String] = []
     public var approvedPhotosData = [String: ApprovedPhotoData]()
+    public var name: String = ""
+    public var age: Int = 0
+    public var gender: String = ""
+    public var country: String = ""
+    
 
-    func addApprovedPhotoData(photoLocation: String, significanceValue: Int) {
-        approvedPhotosData[photoLocation] = ApprovedPhotoData(photoLocation: photoLocation, significanceValue: significanceValue)
+    func addApprovedPhotoData(photoLocation: String, significanceValue: Int, image: UIImage) {
+        approvedPhotosData[photoLocation] = ApprovedPhotoData(photoLocation: photoLocation, significanceValue: significanceValue, image: image)
     }
     
     
@@ -38,25 +44,25 @@ class DataSet {
     
     // for debugging:
     
-    func randomImagesForDataset(numOfPhotos: Int) {
-        let fetchOptions = PHFetchOptions()
-        fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
-        
-        // Add a predicate to exclude screenshots
-        fetchOptions.predicate = NSPredicate(format: "mediaType == %d && !(mediaSubtype & %d != 0)", PHAssetMediaType.image.rawValue, PHAssetMediaSubtype.photoScreenshot.rawValue)
-        
-        let allPhotos = PHAsset.fetchAssets(with: .image, options: fetchOptions)
-
-        let count = allPhotos.count
-        if count > 0 {
-            for _ in 0..<numOfPhotos {
-                let randomIndex = Int(arc4random_uniform(UInt32(count)))
-                let randomPhoto = allPhotos.object(at: randomIndex)
-                let photoLocation = randomPhoto.localIdentifier
-                addApprovedPhotoData(photoLocation: photoLocation, significanceValue: 1)
-            }
-        }
-    }
+//    func randomImagesForDataset(numOfPhotos: Int) {
+//        let fetchOptions = PHFetchOptions()
+//        fetchOptions.sortDescriptors = [NSSortDescriptor(key: "creationDate", ascending: false)]
+//        
+//        // Add a predicate to exclude screenshots
+//        fetchOptions.predicate = NSPredicate(format: "mediaType == %d && !(mediaSubtype & %d != 0)", PHAssetMediaType.image.rawValue, PHAssetMediaSubtype.photoScreenshot.rawValue)
+//        
+//        let allPhotos = PHAsset.fetchAssets(with: .image, options: fetchOptions)
+//
+//        let count = allPhotos.count
+//        if count > 0 {
+//            for _ in 0..<numOfPhotos {
+//                let randomIndex = Int(arc4random_uniform(UInt32(count)))
+//                let randomPhoto = allPhotos.object(at: randomIndex)
+//                let photoLocation = randomPhoto.localIdentifier
+//                addApprovedPhotoData(photoLocation: photoLocation, significanceValue: 1)
+//            }
+//        }
+//    }
 }
 
 

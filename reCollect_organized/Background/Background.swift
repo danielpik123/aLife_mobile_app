@@ -14,6 +14,9 @@ class Background: NSObject {
     private var curX: CGFloat = 0.0
     private var curY: CGFloat = 0.0
     private var curOpacity: CGFloat = 1.0
+    private var scrollIninialX: CGFloat = 0.0
+    private var scrollIninialY: CGFloat = 0.0
+    private var scrollIninialScale: CGFloat = 0.0
     private var scrollViewEffects: [UIScrollView: BackgroundEffect] = [:]
     
     // Shared instance
@@ -46,15 +49,23 @@ class Background: NSObject {
         }
     }
 
-    func changeZoom(newScale: CGFloat, newX: CGFloat, newY: CGFloat, duration: TimeInterval ,delay: CGFloat = 0, options: UIView.AnimationOptions = .curveEaseInOut) {
+    func changeZoom(newScale: CGFloat, newX: CGFloat, newY: CGFloat, duration: TimeInterval ,delay: CGFloat = 0, options: UIView.AnimationOptions = .curveEaseInOut, completion: (() -> Void)? = nil) {
         curScale = newScale
         curX = newX
         curY = newY
         
-        UIView.animate(withDuration: duration, delay: delay, options: options) {
+        //        UIView.animate(withDuration: duration, delay: delay, options: options) {
+        //            let transform = CGAffineTransform(scaleX: newScale, y: newScale).translatedBy(x: newX, y: newY)
+        //            self.imageView.transform = transform
+        //        }
+        UIView.animate(withDuration: duration, delay: TimeInterval(delay), options: options, animations: {
             let transform = CGAffineTransform(scaleX: newScale, y: newScale).translatedBy(x: newX, y: newY)
             self.imageView.transform = transform
-        }
+        }, completion: { finished in
+            if finished {
+                completion?() // Call the completion closure only if it's provided and the animation completes
+            }
+        })
     }
     func changeZoom(newScale: CGFloat, newX: CGFloat, duration: TimeInterval) {
         changeZoom(newScale: newScale, newX: newX, newY: curY, duration: duration)
@@ -102,6 +113,11 @@ class Background: NSObject {
         return curOpacity
     }
     
+    func setScrollInitials() {
+        scrollIninialX = getCurrentX()
+        scrollIninialY = getCurrentY()
+        scrollIninialScale = getCurrentScale()
+    }
 }
 
 extension Background: UIScrollViewDelegate {
@@ -115,9 +131,9 @@ extension Background: UIScrollViewDelegate {
 //        let initialScale = scrollView.getCurrentScale()
 //        let initialOpacity = scrollView.getCurrentOpacity()
         
-        let initialX = self.getCurrentX()
-        let initialY = self.getCurrentY()
-        let initialScale = self.getCurrentScale()
+        let initialX = self.scrollIninialX
+        let initialY = self.scrollIninialY
+        let initialScale = self.scrollIninialScale
 
         let contentOffset = scrollView.contentOffset
 

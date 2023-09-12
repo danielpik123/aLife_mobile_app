@@ -14,6 +14,7 @@ class RateVC: ViewControllerHandler {
     
     private let scrollView = UIScrollView()
     private let nextButton = UIButton()
+    private let behavior = ScaleBehaviorBigObj()
     private var approvedPhotos: [ApprovedPhotoData] = Array(DataSet.shared.approvedPhotosData.values)
     private let numberOfColumns = 4
     private let spacing: CGFloat = 5
@@ -29,11 +30,11 @@ class RateVC: ViewControllerHandler {
     }
 
     func setupView() {
-        
+        behavior.apply(to: nextButton)
         photoWidth = (UIScreen.main.bounds.width - spacing * (CGFloat(numberOfColumns) + 1)) / CGFloat(numberOfColumns)
         
         // delete later
-        DataSet.shared.randomImagesForDataset(numOfPhotos: 100)
+//        DataSet.shared.randomImagesForDataset(numOfPhotos: 100)
         approvedPhotos = Array(DataSet.shared.approvedPhotosData.values)
         // till here
         
@@ -47,8 +48,6 @@ class RateVC: ViewControllerHandler {
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
         
-        let effect = Effect2()
-        Background.shared.addEffect(to: scrollView, effect: effect)
         
         // Add instructions label
         let windowView = UIView(frame: CGRect(x: spacing, y: spacing, width: view.bounds.width - spacing*2, height: photoWidth))
@@ -71,10 +70,27 @@ class RateVC: ViewControllerHandler {
     }
 
     func teardownView() {
+        
+        for subview in scrollView.subviews {
+                subview.removeFromSuperview()
+            }
+
+            // Remove the scrollView from the main view
+            scrollView.removeFromSuperview()
+
+            // Clear the grid of image views
+            grid.removeAll()
+
+            // Clear all frames dictionary
+            allFrames.removeAll()
     }
 
     func executeLogic() {
-        Background.shared.changeZoom(newScale: 1.8, newX: 80, newY: 100, duration: 1)
+        Background.shared.changeZoom(newScale: 1.8, newX: 80, newY: 100, duration: 1){
+            let effect = Effect2()
+            Background.shared.setScrollInitials()
+            Background.shared.addEffect(to: self.scrollView, effect: effect)
+        }
       
     }
 
@@ -541,33 +557,45 @@ class RateVC: ViewControllerHandler {
 
 
     private func setImage(for imageView: UIImageView, with localIdentifier: String) {
-        let fetchOptions = PHFetchOptions()
-        fetchOptions.predicate = NSPredicate(format: "localIdentifier = %@", localIdentifier)
-        let fetchResult = PHAsset.fetchAssets(with: fetchOptions)
-
-        if let asset = fetchResult.firstObject {
-            let manager = PHImageManager.default()
-            let requestOptions = PHImageRequestOptions()
-            requestOptions.isSynchronous = true
-            requestOptions.isNetworkAccessAllowed = true
-            manager.requestImage(for: asset, targetSize: CGSize(width: 300, height: 300), contentMode: .aspectFill, options: requestOptions) { (image, _) in
-                if let image = image {
-                    imageView.image = image
-                    
-
-                    // Add number label
-                    let numberLabel = UILabel(frame: CGRect(x: 5, y: imageView.bounds.height - 25, width: 30, height: 20))
-                    numberLabel.text = "1"
-                    numberLabel.textAlignment = .center
-                    numberLabel.backgroundColor = .black
-                    numberLabel.textColor = .white
-                    numberLabel.layer.cornerRadius = 10
-                    numberLabel.clipsToBounds = true
-                    numberLabel.tag = 100 // Assign a unique tag to the label
-                    imageView.addSubview(numberLabel)
-                }
-            }
-        }
+        imageView.image = DataSet.shared.approvedPhotosData[localIdentifier]?.image
+        
+        // Add number label
+        let numberLabel = UILabel(frame: CGRect(x: 5, y: imageView.bounds.height - 25, width: 30, height: 20))
+        numberLabel.text = "1"
+        numberLabel.textAlignment = .center
+        numberLabel.backgroundColor = .black
+        numberLabel.textColor = .white
+        numberLabel.layer.cornerRadius = 10
+        numberLabel.clipsToBounds = true
+        numberLabel.tag = 100 // Assign a unique tag to the label
+        imageView.addSubview(numberLabel)
+//        let fetchOptions = PHFetchOptions()
+//        fetchOptions.predicate = NSPredicate(format: "localIdentifier = %@", localIdentifier)
+//        let fetchResult = PHAsset.fetchAssets(with: fetchOptions)
+//
+//        if let asset = fetchResult.firstObject {
+//            let manager = PHImageManager.default()
+//            let requestOptions = PHImageRequestOptions()
+//            requestOptions.isSynchronous = true
+//            requestOptions.isNetworkAccessAllowed = true
+//            manager.requestImage(for: asset, targetSize: CGSize(width: 300, height: 300), contentMode: .aspectFill, options: requestOptions) { (image, _) in
+//                if let image = image {
+//                    imageView.image = image
+//
+//
+//                    // Add number label
+//                    let numberLabel = UILabel(frame: CGRect(x: 5, y: imageView.bounds.height - 25, width: 30, height: 20))
+//                    numberLabel.text = "1"
+//                    numberLabel.textAlignment = .center
+//                    numberLabel.backgroundColor = .black
+//                    numberLabel.textColor = .white
+//                    numberLabel.layer.cornerRadius = 10
+//                    numberLabel.clipsToBounds = true
+//                    numberLabel.tag = 100 // Assign a unique tag to the label
+//                    imageView.addSubview(numberLabel)
+//                }
+//            }
+//        }
     }
 
     
@@ -803,7 +831,7 @@ class RateVC: ViewControllerHandler {
     }
     
     @objc func nextButtonTapped() {
-        
+        self.delegate?.handler(self, didFinishWithTransitionTo: CompareVC.self)
     }
 }
 

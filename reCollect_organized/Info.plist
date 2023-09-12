@@ -11,12 +11,12 @@
 			<string>google identifier</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>com.googleusercontent.apps.27754498404-p5p66c785n6pnoalqq9gkti7bv9dfa8l</string>
+				<string>com.googleusercontent.apps.822258593020-e4ic4l56nnnlt4vqfi54eai9pav84b1m</string>
 			</array>
 		</dict>
 	</array>
 	<key>GIDClientID</key>
-	<string>27754498404-p5p66c785n6pnoalqq9gkti7bv9dfa8l.apps.googleusercontent.com</string>
+	<string>822258593020-e4ic4l56nnnlt4vqfi54eai9pav84b1m.apps.googleusercontent.com</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
