@@ -17,8 +17,7 @@ class FramedMemoryBehavior: UIDynamicBehavior {
         // You could add any other behaviors (e.g. UIAttachmentBehavior, UIGravityBehavior, etc.)
         // to this composite behavior, and they would all influence the `memoryView`.
         // Here is just a basic example:
-        let gravityBehavior = UIGravityBehavior(items: [memoryView])
-        addChildBehavior(gravityBehavior)
+
         
         // The `action` closure is called every animation frame.
         action = { [unowned self] in

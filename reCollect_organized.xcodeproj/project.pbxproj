@@ -63,6 +63,7 @@
 		ECEA84F82AAA3C9B006688D6 /* FirebaseFirestoreCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = ECEA84F72AAA3C9B006688D6 /* FirebaseFirestoreCombine-Community */; };
 		ECEA84FA2AAA3C9B006688D6 /* FirebaseFirestoreSwift in Frameworks */ = {isa = PBXBuildFile; productRef = ECEA84F92AAA3C9B006688D6 /* FirebaseFirestoreSwift */; };
 		ECEA85082AAA628C006688D6 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = ECEA85072AAA628C006688D6 /* GoogleService-Info.plist */; };
+		ECEA85102ABC692A006688D6 /* AppleSignInDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = ECEA850F2ABC692A006688D6 /* AppleSignInDelegate.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -112,7 +113,9 @@
 		ECEA84E92AA9DB21006688D6 /* CompareVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompareVC.swift; sourceTree = "<group>"; };
 		ECEA84EB2AAA15D9006688D6 /* CompareButtons.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CompareButtons.swift; sourceTree = "<group>"; };
 		ECEA84ED2AAA37F5006688D6 /* FirebaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseManager.swift; sourceTree = "<group>"; };
-		ECEA85072AAA628C006688D6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/Black.Cat.White.Cat.1998.DVDRip.x264.AAC-NESMEURED/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		ECEA85072AAA628C006688D6 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		ECEA850D2AB9BF28006688D6 /* reCollect_organized.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = reCollect_organized.entitlements; sourceTree = "<group>"; };
+		ECEA850F2ABC692A006688D6 /* AppleSignInDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppleSignInDelegate.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -260,6 +263,7 @@
 		ECDA13A72A41A4A400FC5B31 /* reCollect_organized */ = {
 			isa = PBXGroup;
 			children = (
+				ECEA850D2AB9BF28006688D6 /* reCollect_organized.entitlements */,
 				ECDA13A82A41A4A400FC5B31 /* AppDelegate.swift */,
 				ECDA13AA2A41A4A400FC5B31 /* SceneDelegate.swift */,
 				ECDA13AC2A41A4A400FC5B31 /* ViewController.swift */,
@@ -268,6 +272,7 @@
 				ECD8AD312A5D8CC900497EB7 /* CustomDesigns */,
 				EC02F6DF2A64474100E4241A /* TopBar */,
 				EC2616642A73ECAC002EB31C /* DataBase */,
+				ECEA850E2ABC68FA006688D6 /* LoginHandlers */,
 				ECDA13AE2A41A4A400FC5B31 /* Main.storyboard */,
 				ECDA13B12A41A4AC00FC5B31 /* Assets.xcassets */,
 				ECDA13B32A41A4AC00FC5B31 /* LaunchScreen.storyboard */,
@@ -308,6 +313,14 @@
 				ECEA84E72AA9D12D006688D6 /* Domain.swift */,
 			);
 			path = CompareDomain;
+			sourceTree = "<group>";
+		};
+		ECEA850E2ABC68FA006688D6 /* LoginHandlers */ = {
+			isa = PBXGroup;
+			children = (
+				ECEA850F2ABC692A006688D6 /* AppleSignInDelegate.swift */,
+			);
+			path = LoginHandlers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -419,6 +432,7 @@
 				EC08D30D2A5ABADF0061F570 /* LoginVC.swift in Sources */,
 				EC26166A2A73F9BE002EB31C /* PhotoLoader.swift in Sources */,
 				ECDD74C92A444BF10073DC8A /* Negative.swift in Sources */,
+				ECEA85102ABC692A006688D6 /* AppleSignInDelegate.swift in Sources */,
 				ECDA13A92A41A4A400FC5B31 /* AppDelegate.swift in Sources */,
 				ECD0AB762A6D508D0072E52E /* FramedMemory.swift in Sources */,
 				ECD0AB782A6E608F0072E52E /* Colours.swift in Sources */,
@@ -585,16 +599,18 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = reCollect_organized/reCollect_organized.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8Y8H8N4D79;
+				DEVELOPMENT_TEAM = CLK6D35PR4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = reCollect_organized/Info.plist;
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Please let us access your visual memory base :)";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -617,16 +633,18 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = reCollect_organized/reCollect_organized.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 8Y8H8N4D79;
+				DEVELOPMENT_TEAM = CLK6D35PR4;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = reCollect_organized/Info.plist;
 				INFOPLIST_KEY_NSPhotoLibraryUsageDescription = "Please let us access your visual memory base :)";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UIStatusBarStyle = UIStatusBarStyleDarkContent;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;

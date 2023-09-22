@@ -12,7 +12,8 @@ class CustomSignInButton: UIButton {
     let buttonWidth: CGFloat = 297 * (UIScreen.main.bounds.height / 844)
     let imageSize: CGFloat = 28 * (UIScreen.main.bounds.height / 844)
     let distFromLeftCorner = 80 * (UIScreen.main.bounds.width / 390)
-    
+    var behavior: ButtonBehavior = ScaleBehaviorBigObj()
+
     private var logoImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
@@ -22,6 +23,7 @@ class CustomSignInButton: UIButton {
     
     init(title: String, logoName: String) {
         super.init(frame: .zero)
+        behavior.apply(to: self)
         
         // Set up the logo
         if let logoImage = UIImage(named: logoName) {
