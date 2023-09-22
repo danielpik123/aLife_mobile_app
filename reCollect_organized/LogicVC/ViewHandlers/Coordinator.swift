@@ -40,10 +40,16 @@ class Coordinator: ViewControllerHandlerDelegate {
             transitionTo(handler: ExplainGeneralVC(view: handler.view))
         } else if nextHandlerType is InfoVC.Type {
             transitionTo(handler: InfoVC(view: handler.view))
+        } else if nextHandlerType is ExplainChooseVC.Type {
+            transitionTo(handler: ExplainChooseVC(view: handler.view))
         } else if nextHandlerType is ChooseVC.Type {
             transitionTo(handler: ChooseVC(view: handler.view))
+        } else if nextHandlerType is ExplainRateVC.Type {
+            transitionTo(handler: ExplainRateVC(view: handler.view))
         } else if nextHandlerType is RateVC.Type {
             transitionTo(handler: RateVC(view: handler.view))
+        } else if nextHandlerType is ExplainCompareVC.Type {
+            transitionTo(handler: ExplainCompareVC(view: handler.view))
         }  else if nextHandlerType is CompareVC.Type {
             transitionTo(handler: CompareVC(view: handler.view))
         } else if nextHandlerType is TestLogicVC2.Type {

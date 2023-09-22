@@ -29,12 +29,14 @@ class ViewController: UIViewController {
         view.sendSubviewToBack(backgroundImageView)
         
         let topBarManager = TopBarManager.shared
-
+        
         // Add the top bar to the view hierarchy
         topBarManager.addToView(view)
 
         // Set up the coordinator
         coordinator = Coordinator()
+        
+        PhotoLoader.shared.loadPhotos()
 
         // Transition to StartVC
         coordinator.transitionTo(handler: StartVC(view: view, viewController: self))

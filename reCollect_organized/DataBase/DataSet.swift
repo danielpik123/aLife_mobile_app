@@ -33,7 +33,14 @@ class DataSet {
         significanceValue = (significanceValue) % 4 + 1
         approvedPhotosData[photoLocation]?.significanceValue = significanceValue
         completion(significanceValue)
-        
+        FirebaseManager.shared.updateSignificanceRating(for: photoLocation, newRating: significanceValue){ error in
+            if let error = error {
+                print("Failed to upload photo: \(error.localizedDescription)")
+            } else {
+                print("Photo uploaded successfully!")
+            }
+        }
+            
         NotificationCenter.default.post(name: DataSet.SignificanceLevelDidChangeNotification, object: nil)
 
     }

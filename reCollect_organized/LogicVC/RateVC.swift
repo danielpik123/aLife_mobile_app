@@ -831,7 +831,7 @@ class RateVC: ViewControllerHandler {
     }
     
     @objc func nextButtonTapped() {
-        self.delegate?.handler(self, didFinishWithTransitionTo: CompareVC.self)
+        self.delegate?.handler(self, didFinishWithTransitionTo: ExplainCompareVC.self)
     }
 }
 

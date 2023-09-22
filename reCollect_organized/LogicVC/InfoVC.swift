@@ -1,9 +1,171 @@
+
 //
 //  TestInfoVC.swift
 //  reCollect_organized
 //
 //  Created by Daniel Pikovsky Yoffe on 13/07/2023.
 //
+
+
+import UIKit
+import SwiftUI
+
+
+class InfoVC: NSObject, ViewControllerHandler {
+    weak var delegate: ViewControllerHandlerDelegate?
+    let genderOptions = ["Male", "Female", "Other"]
+    let  countries: [String] = Locale.isoRegionCodes.compactMap { Locale.current.localizedString(forRegionCode: $0) }
+    
+    let view: UIView
+    let captionLabel: UILabel
+    
+    
+    var fullNameField: UITextField!
+    var birthDateField: CustomInfoPlaceholder!
+    var genderField: CustomInfoPlaceholder!
+    var countryField: CustomInfoPlaceholder!
+    
+    // Define constants for layout
+    var captionTopConstant: CGFloat 
+    var fullNameTopConstant: CGFloat
+    var birthDateTopConstant: CGFloat
+    var genderTopConstant: CGFloat
+    var countryTopConstant: CGFloat
+    var nextConstant: CGFloat
+    var FieldsPadding : CGFloat
+    var allFieldsFilled: Bool = false
+    var nextButton: CustomNextButton!
+
+    
+    var imojiHostingController: UIHostingController<SelfImoji>!
+    var viewModel: ImojiViewModel
+    
+    
+    init(view: UIView) {
+        self.view = view
+        self.FieldsPadding = 10 * view.frame.height / 844
+        self.captionTopConstant = 258 * view.frame.height / 844
+        self.fullNameTopConstant = 361 * view.frame.height / 844
+        self.birthDateTopConstant = self.fullNameTopConstant + 53 + self.FieldsPadding
+        self.genderTopConstant = self.birthDateTopConstant + 53 + self.FieldsPadding
+        self.countryTopConstant = self.genderTopConstant + 53 + self.FieldsPadding
+        self.nextConstant = self.countryTopConstant + 53 + (self.FieldsPadding) * 3 
+        
+        self.captionLabel = UILabel()
+        self.nextButton = CustomNextButton(behavior: ScaleBehavior())
+
+
+        // Create the hosting controller with the SwiftUI view in UIKit class
+        viewModel = ImojiViewModel()
+        imojiHostingController = UIHostingController(rootView: SelfImoji(viewModel: viewModel))
+        
+        super.init()
+        
+//        self.fullNameField.delegate = self
+        self.fullNameField = makeFullNameField()
+        self.birthDateField = makeBirthDateField()
+        self.genderField = makeGenderField()
+        self.countryField = makeCountryField()
+        
+        
+        captionLabel.text = "Personal Details"
+        captionLabel.font = UIFont.boldSystemFont(ofSize: 24)
+        captionLabel.translatesAutoresizingMaskIntoConstraints = false
+        
+        self.imojiHostingController.view.alpha = 0
+        self.captionLabel.alpha = 0
+        self.fullNameField.alpha = 0
+        self.birthDateField.alpha = 0
+        self.genderField.alpha = 0
+        self.countryField.alpha = 0
+    }
+    
+    func setupView() {
+        // Add objects to view hierarchy
+        view.addSubview(imojiHostingController.view)
+        view.addSubview(captionLabel)
+        view.addSubview(fullNameField)
+        view.addSubview(birthDateField)
+        view.addSubview(genderField)
+        view.addSubview(countryField)
+        view.addSubview(nextButton)
+        nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
+
+        
+        // Position and constrain the label and fields
+        setupImoji()
+        setupLabelOrField(captionLabel, topAnchorConstant: captionTopConstant)
+        setupLabelOrField(fullNameField, topAnchorConstant: fullNameTopConstant)
+        setupLabelOrField(birthDateField, topAnchorConstant: birthDateTopConstant)
+        setupLabelOrField(genderField, topAnchorConstant: genderTopConstant)
+        setupLabelOrField(countryField, topAnchorConstant: countryTopConstant)
+        setupLabelOrField(nextButton, topAnchorConstant: nextConstant)
+        
+        
+        // Add tap gesture recognizer to view
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
+        tapGesture.cancelsTouchesInView = false
+        view.addGestureRecognizer(tapGesture)
+    }
+    
+    
+    
+    func setupImoji(){
+        imojiHostingController.view.translatesAutoresizingMaskIntoConstraints = false
+        imojiHostingController.view.backgroundColor = UIColor.clear
+        imojiHostingController.view.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        imojiHostingController.view.centerYAnchor.constraint(equalTo: view.topAnchor, constant: 200).isActive = true
+    }
+    
+    func setupLabelOrField(_ object: UIView, topAnchorConstant: CGFloat) {
+        object.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
+        object.topAnchor.constraint(equalTo: self.view.topAnchor, constant: topAnchorConstant).isActive = true
+    }
+    
+    func teardownView() {
+        // Remove the caption label and fields from the view hierarchy
+        imojiHostingController.view.removeFromSuperview()
+        captionLabel.removeFromSuperview()
+        fullNameField.removeFromSuperview()
+        birthDateField.removeFromSuperview()
+        genderField.removeFromSuperview()
+        countryField.removeFromSuperview()
+        nextButton.removeFromSuperview()
+    }
+    
+    func executeLogic() {
+        
+        Background.shared.changeZoom(newScale: 2.5, newX: 70, newY: -30, duration: 1)
+        
+        // Animate the caption label
+        UIView.animate(withDuration: 1.0) {
+            self.imojiHostingController.view.alpha = 1
+            self.captionLabel.alpha = 1
+            self.fullNameField.alpha = 0.9
+            self.birthDateField.alpha = 0.9
+            self.genderField.alpha = 0.9
+            self.countryField.alpha = 0.9
+        }
+    }
+    
+    @objc private func nextButtonTapped(_ sender: UIButton) {
+        FirebaseManager.shared.saveUserData(name: fullNameField.text!, age: birthDateField.text!, gender: genderField.text!, country: countryField.text!)
+        // Animate the caption label
+        UIView.animate(withDuration: 1, animations: {
+            self.imojiHostingController.view.alpha = 0
+            self.captionLabel.alpha = 0
+            self.fullNameField.alpha = 0
+            self.birthDateField.alpha = 0
+            self.genderField.alpha = 0
+            self.countryField.alpha = 0
+            self.nextButton.alpha = 0
+        }){ _ in
+            self.delegate?.handler(self, didFinishWithTransitionTo: ExplainChooseVC.self)
+        }
+    }
+    
+}
+
 
 //import UIKit
 //
@@ -229,162 +391,3 @@
 
 
 // try to add swiftUI ///
-
-
-import UIKit
-import SwiftUI
-
-
-class InfoVC: NSObject, ViewControllerHandler {
-    weak var delegate: ViewControllerHandlerDelegate?
-    let genderOptions = ["Male", "Female", "Other"]
-    let  countries: [String] = Locale.isoRegionCodes.compactMap { Locale.current.localizedString(forRegionCode: $0) }
-    
-    let view: UIView
-    let captionLabel: UILabel
-    
-    
-    var fullNameField: UITextField!
-    var birthDateField: CustomInfoPlaceholder!
-    var genderField: CustomInfoPlaceholder!
-    var countryField: CustomInfoPlaceholder!
-    
-    // Define constants for layout
-    var captionTopConstant: CGFloat 
-    var fullNameTopConstant: CGFloat
-    var birthDateTopConstant: CGFloat
-    var genderTopConstant: CGFloat
-    var countryTopConstant: CGFloat
-    var nextConstant: CGFloat
-    var FieldsPadding : CGFloat
-    var allFieldsFilled: Bool = false
-    var nextButton: CustomNextButton!
-
-    
-    var imojiHostingController: UIHostingController<SelfImoji>!
-    var viewModel: ImojiViewModel
-    
-    
-    init(view: UIView) {
-        self.view = view
-        self.FieldsPadding = 10 * view.frame.height / 844
-        self.captionTopConstant = 258 * view.frame.height / 844
-        self.fullNameTopConstant = 361 * view.frame.height / 844
-        self.birthDateTopConstant = self.fullNameTopConstant + 53 + self.FieldsPadding
-        self.genderTopConstant = self.birthDateTopConstant + 53 + self.FieldsPadding
-        self.countryTopConstant = self.genderTopConstant + 53 + self.FieldsPadding
-        self.nextConstant = self.countryTopConstant + 53 + (self.FieldsPadding) * 3 
-        
-        self.captionLabel = UILabel()
-        self.nextButton = CustomNextButton(behavior: ScaleBehavior())
-
-
-        // Create the hosting controller with the SwiftUI view in UIKit class
-        viewModel = ImojiViewModel()
-        imojiHostingController = UIHostingController(rootView: SelfImoji(viewModel: viewModel))
-        
-        super.init()
-        
-//        self.fullNameField.delegate = self
-        self.fullNameField = makeFullNameField()
-        self.birthDateField = makeBirthDateField()
-        self.genderField = makeGenderField()
-        self.countryField = makeCountryField()
-        
-        
-        captionLabel.text = "Personal Details"
-        captionLabel.font = UIFont.boldSystemFont(ofSize: 24)
-        captionLabel.translatesAutoresizingMaskIntoConstraints = false
-        
-        self.imojiHostingController.view.alpha = 0
-        self.captionLabel.alpha = 0
-        self.fullNameField.alpha = 0
-        self.birthDateField.alpha = 0
-        self.genderField.alpha = 0
-        self.countryField.alpha = 0
-    }
-    
-    func setupView() {
-        // Add objects to view hierarchy
-        view.addSubview(imojiHostingController.view)
-        view.addSubview(captionLabel)
-        view.addSubview(fullNameField)
-        view.addSubview(birthDateField)
-        view.addSubview(genderField)
-        view.addSubview(countryField)
-        view.addSubview(nextButton)
-        nextButton.addTarget(self, action: #selector(nextButtonTapped), for: .touchUpInside)
-
-        
-        // Position and constrain the label and fields
-        setupImoji()
-        setupLabelOrField(captionLabel, topAnchorConstant: captionTopConstant)
-        setupLabelOrField(fullNameField, topAnchorConstant: fullNameTopConstant)
-        setupLabelOrField(birthDateField, topAnchorConstant: birthDateTopConstant)
-        setupLabelOrField(genderField, topAnchorConstant: genderTopConstant)
-        setupLabelOrField(countryField, topAnchorConstant: countryTopConstant)
-        setupLabelOrField(nextButton, topAnchorConstant: nextConstant)
-        
-        
-        // Add tap gesture recognizer to view
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(handleTap))
-        tapGesture.cancelsTouchesInView = false
-        view.addGestureRecognizer(tapGesture)
-    }
-    
-    
-    
-    func setupImoji(){
-        imojiHostingController.view.translatesAutoresizingMaskIntoConstraints = false
-        imojiHostingController.view.backgroundColor = UIColor.clear
-        imojiHostingController.view.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
-        imojiHostingController.view.centerYAnchor.constraint(equalTo: view.topAnchor, constant: 200).isActive = true
-    }
-    
-    func setupLabelOrField(_ object: UIView, topAnchorConstant: CGFloat) {
-        object.centerXAnchor.constraint(equalTo: self.view.centerXAnchor).isActive = true
-        object.topAnchor.constraint(equalTo: self.view.topAnchor, constant: topAnchorConstant).isActive = true
-    }
-    
-    func teardownView() {
-        // Remove the caption label and fields from the view hierarchy
-        imojiHostingController.view.removeFromSuperview()
-        captionLabel.removeFromSuperview()
-        fullNameField.removeFromSuperview()
-        birthDateField.removeFromSuperview()
-        genderField.removeFromSuperview()
-        countryField.removeFromSuperview()
-        nextButton.removeFromSuperview()
-    }
-    
-    func executeLogic() {
-        
-        Background.shared.changeZoom(newScale: 2.5, newX: 70, newY: -30, duration: 1)
-        
-        // Animate the caption label
-        UIView.animate(withDuration: 1.0) {
-            self.imojiHostingController.view.alpha = 1
-            self.captionLabel.alpha = 1
-            self.fullNameField.alpha = 0.9
-            self.birthDateField.alpha = 0.9
-            self.genderField.alpha = 0.9
-            self.countryField.alpha = 0.9
-        }
-    }
-    
-    @objc private func nextButtonTapped(_ sender: UIButton) {
-        // Animate the caption label
-        UIView.animate(withDuration: 1, animations: {
-            self.imojiHostingController.view.alpha = 0
-            self.captionLabel.alpha = 0
-            self.fullNameField.alpha = 0
-            self.birthDateField.alpha = 0
-            self.genderField.alpha = 0
-            self.countryField.alpha = 0
-            self.nextButton.alpha = 0
-        }){ _ in
-            self.delegate?.handler(self, didFinishWithTransitionTo: ChooseVC.self)
-        }
-    }
-    
-}

@@ -14,6 +14,8 @@ class FramedMemory: UIView {
     public let whiteFrameFrame: UIView
     public let innerFrame: UIView
     public var localIdentifier: String!
+    
+    var countLabel:UILabel = UILabel()
 
     
     public var gradient: CAGradientLayer!
@@ -35,9 +37,10 @@ class FramedMemory: UIView {
     public var objectAttached: Bool = false
     public var objedtInRightSpin: Bool = false
     public var lineLayers: [CAShapeLayer] = []
+    
+    public var startTime: Date?
 
-
-    var panAttachment: UIAttachmentBehavior?
+//    var panAttachment: UIAttachmentBehavior?
 //    var displayLink: CADisplayLink?
 
     var behavior: FramedMemoryBehavior!
@@ -72,6 +75,7 @@ class FramedMemory: UIView {
         self.addSubview(whiteFrameFrame)
         self.addSubview(innerFrame)
         self.addSubview(imageView)
+        self.addSubview(countLabel)
         
         // Frame sizes
         outerFrame.translatesAutoresizingMaskIntoConstraints = false
@@ -95,6 +99,12 @@ class FramedMemory: UIView {
         // add dragging effect
         let panGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(handlePanGesture(_:)))
         self.addGestureRecognizer(panGestureRecognizer)
+        
+        //specify counting label
+        countLabel.text = "\(chooseVC.selectedPhotosCount) / 50"
+        countLabel.textAlignment = .center
+        countLabel.font = UIFont.systemFont(ofSize: self.chooseVC.view.frame.width/15, weight: .bold)
+        countLabel.translatesAutoresizingMaskIntoConstraints = false
 
 
 
@@ -197,6 +207,14 @@ class FramedMemory: UIView {
         let imageAspectRatio = (imageView.image?.size.width ?? 1) / (imageView.image?.size.height ?? 1)
         aspectRatioConstraint = imageView.widthAnchor.constraint(equalTo: imageView.heightAnchor, multiplier: imageAspectRatio)
         aspectRatioConstraint?.isActive = true
+        
+                
+        NSLayoutConstraint.activate([
+//            countLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor, constant: -view.frame.width/4),
+//            countLabel.bottomAnchor.constraint(equalTo: view.topAnchor, constant: FramedMemoryPadding)
+            countLabel.leadingAnchor.constraint(equalTo: outerFrame.leadingAnchor, constant: padding*4),
+            countLabel.bottomAnchor.constraint(equalTo: outerFrame.topAnchor)
+        ])
 
     }
     
@@ -361,7 +379,7 @@ class FramedMemory: UIView {
             dynamicItemBehavior.addAngularVelocity(angle, for: self)
             
             if (latestXoffset > 25){
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                     self.swipeRightBehavior()
                 }
             }
@@ -396,7 +414,7 @@ class FramedMemory: UIView {
         dynamicItemBehavior = nil
         attachment1 = nil
         attachment2 = nil
-        panAttachment = nil
+//        panAttachment = nil
         behavior = nil
 
         // Clear pointers
@@ -432,10 +450,16 @@ class FramedMemory: UIView {
         whiteFrame.removeFromSuperview()
         whiteFrameFrame.removeFromSuperview()
         innerFrame.removeFromSuperview()
+        imageView.image = nil
         
         // Remove additional pointers:
         self.localIdentifier = nil
+        self.startTime = nil
         
+    }
+    
+    deinit {
+        print("\(self) is being deallocated")
     }
     
 }

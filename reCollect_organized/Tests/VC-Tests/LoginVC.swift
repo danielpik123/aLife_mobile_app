@@ -10,6 +10,8 @@
 import UIKit
 import GoogleSignIn
 import FirebaseAuth
+import AuthenticationServices
+
 
 class LoginVC: ViewControllerHandler {
     weak var delegate: ViewControllerHandlerDelegate?
@@ -31,6 +33,8 @@ class LoginVC: ViewControllerHandler {
     let privacyTxtSize: CGFloat = 10 * (UIScreen.main.bounds.width / 390)
     let welcomeTxtPositionY: CGFloat = 286 * (UIScreen.main.bounds.height / 844)
     let privacyTxtPositionY: CGFloat = 774 * (UIScreen.main.bounds.height / 844)
+
+    private let appleSignInDelegate = AppleSignInDelegate()
 
     
     init(view: UIView, viewController: UIViewController) {
@@ -58,6 +62,9 @@ class LoginVC: ViewControllerHandler {
         // Initialize LogoAndTagline
         logoAndTagline = LogoAndTagline()
         logoAndTagline.alpha = 0
+        
+        appleSignInDelegate.loginVC = self
+
     }
     
     func setupView() {
@@ -136,7 +143,8 @@ class LoginVC: ViewControllerHandler {
             didTapGoogleSignInButton()
         case appleButton:
             print("Apple button tapped.")
-            // handle Apple sign in
+            didTapAppleSignInButton()
+
         case facebookButton:
             print("Facebook button tapped.")
             // handle Facebook sign in
@@ -150,6 +158,16 @@ class LoginVC: ViewControllerHandler {
 
     deinit {
         print("\(self) is being deallocated")
+    }
+    
+    @objc func didTapAppleSignInButton() {
+        let request = ASAuthorizationAppleIDProvider().createRequest()
+        request.requestedScopes = [.fullName, .email]
+
+        let authorizationController = ASAuthorizationController(authorizationRequests: [request])
+        authorizationController.delegate = appleSignInDelegate
+        authorizationController.presentationContextProvider = appleSignInDelegate
+        authorizationController.performRequests()
     }
     
     @objc func didTapGoogleSignInButton() {
@@ -173,22 +191,26 @@ class LoginVC: ViewControllerHandler {
                 }
                 
                 print("Successfully logged in with Google")
-                // Trigger transition to the next ViewControllerHandler
-                
-                UIView.animate(withDuration: 1, animations: {
-                    self.googleButton.alpha = 0
-                    self.appleButton.alpha = 0
-                    self.facebookButton.alpha = 0
-                    self.phoneButton.alpha = 0
-                    self.welcomeLabel.alpha = 0
-                    self.privacyLabel.alpha = 0
-                    self.logoAndTagline.alpha = 0
-                }){ _ in
-                    // Animate the top bar height
-                    TopBarManager.shared.extendBar()
-                    self.delegate?.handler(self, didFinishWithTransitionTo: ExplainGeneralVC.self)
-                }
+                self.finishLogin()
             }
+        }
+    }
+    /**
+     Trigger transition to the next ViewControllerHandler
+     */
+    public func finishLogin(){
+        UIView.animate(withDuration: 1, animations: {
+            self.googleButton.alpha = 0
+            self.appleButton.alpha = 0
+            self.facebookButton.alpha = 0
+            self.phoneButton.alpha = 0
+            self.welcomeLabel.alpha = 0
+            self.privacyLabel.alpha = 0
+            self.logoAndTagline.alpha = 0
+        }){ _ in
+            // Animate the top bar height
+            TopBarManager.shared.extendBar()
+            self.delegate?.handler(self, didFinishWithTransitionTo: ExplainGeneralVC.self)
         }
     }
 }

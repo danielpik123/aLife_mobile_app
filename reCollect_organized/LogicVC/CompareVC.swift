@@ -36,6 +36,7 @@ class CompareVC: ViewControllerHandler {
     var comparisonQuestion: String!
     var comparisonLabel = UILabel()
 
+    let comparisonsInDomain:Int = 10
     
     init(view: UIView) {
         self.view = view
@@ -84,8 +85,10 @@ class CompareVC: ViewControllerHandler {
             tapHintLabel.topAnchor.constraint(equalTo: explainCardButton.imageView!.bottomAnchor, constant: 10)
         ])
         
-        button1.addTarget(self, action: #selector(compareButtonTapped),  for: .touchUpInside)
-        button2.addTarget(self, action: #selector(compareButtonTapped),  for: .touchUpInside)
+//        button1.addTarget(self, action: #selector(compareButtonTapped),  for: .touchUpInside)
+//        button2.addTarget(self, action: #selector(compareButtonTapped),  for: .touchUpInside)
+        button1.addTarget(self, action: #selector(compareButtonTapped(sender:)), for: .touchUpInside)
+        button2.addTarget(self, action: #selector(compareButtonTapped(sender:)), for: .touchUpInside)
 
         
         // Setup button1 and button2
@@ -175,15 +178,21 @@ class CompareVC: ViewControllerHandler {
         }
     }
     
-    @objc private func compareButtonTapped(){
+    @objc private func compareButtonTapped(sender: UIButton) {
         button1.isUserInteractionEnabled = false
         button2.isUserInteractionEnabled = false
+        if sender === button1 {
+            FirebaseManager.shared.savePhotoComparison(domain: domains[currentDomainIndex], more: randomPhotoCouples[indexComparison][0], less: randomPhotoCouples[indexComparison][1])
+        }
+        else if sender === button2 {
+            FirebaseManager.shared.savePhotoComparison(domain: domains[currentDomainIndex], more: randomPhotoCouples[indexComparison][1], less: randomPhotoCouples[indexComparison][0])        }
+
         UIView.animate(withDuration: 0.5 , animations: { [self] in
             button1.alpha = 0
             button2.alpha = 0
             vsLabel.alpha = 0
         }){ [self]_ in
-            if indexComparison < 2{
+            if indexComparison < (comparisonsInDomain-1){
                 indexComparison += 1
                 setNewComp()
             }
@@ -383,7 +392,7 @@ class CompareVC: ViewControllerHandler {
         
         var availablePhotoLocations = allPhotoLocations
         
-        for _ in 1...3 {
+        for _ in 1...comparisonsInDomain {
             // Ensure there are at least 2 photos left to form a couple
             guard availablePhotoLocations.count >= 2 else { break }
             

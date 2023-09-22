@@ -17,8 +17,7 @@ class FramedMemoryBehavior: UIDynamicBehavior {
         // You could add any other behaviors (e.g. UIAttachmentBehavior, UIGravityBehavior, etc.)
         // to this composite behavior, and they would all influence the `memoryView`.
         // Here is just a basic example:
-        let gravityBehavior = UIGravityBehavior(items: [memoryView])
-        addChildBehavior(gravityBehavior)
+
         
         // The `action` closure is called every animation frame.
         action = { [unowned self] in
@@ -86,10 +85,12 @@ extension FramedMemory {
         if !self.objectAttached {
             return
         }
+        self.chooseVC.increaseCount()
         self.objectAttached = false
         self.objedtInRightSpin = true
+        let responseTime = responseTime()
         DataSet.shared.addApprovedPhotoData(photoLocation: self.localIdentifier , significanceValue: 1, image: self.imageView.image!)
-        FirebaseManager.shared.uploadPhoto(localIdentifier: self.localIdentifier, significanceRating: 1, image: self.imageView.image!) { error in
+        FirebaseManager.shared.uploadPhoto(localIdentifier: self.localIdentifier, significanceRating: 1, image: self.imageView.image!, timeInterval: responseTime) { error in
             if let error = error {
                 print("Failed to upload photo: \(error.localizedDescription)")
             } else {
@@ -97,9 +98,9 @@ extension FramedMemory {
             }
         }
         DataSet.shared.shownPhotos.append(self.localIdentifier)
-        animator.removeBehavior(attachment1)
+        animator.removeBehavior(attachment2)
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-            self.animator.removeBehavior(self.attachment2)
+            self.animator.removeBehavior(self.attachment1)
             self.gravity.gravityDirection = CGVector(dx: 0, dy: -1)
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
                 self.updateImage()
@@ -223,13 +224,15 @@ extension FramedMemory {
             
             newSelf.chooseVC!.framedMemory.setupSuperviewConstraints()
             
-            UIView.animate(withDuration: 0.3, animations: {newSelf.chooseVC!.framedMemory.alpha = 1})
+            UIView.animate(withDuration: 0.3, animations: {newSelf.chooseVC!.framedMemory.alpha = 1}){_ in
+                newSelf.startTime = Date()
+            }
         }
     }
     
     func addNextButton(){
         let count = DataSet.shared.numberOfApprovedPhotos()
-        let enoughPhotos = count == 7
+        let enoughPhotos = count == 50
         
         if enoughPhotos {
             if ((self.behavior) != nil){
@@ -237,5 +240,12 @@ extension FramedMemory {
 
             }
         }
+    }
+    
+    func responseTime() -> TimeInterval{
+        let endTime = Date()
+        let start = startTime!
+        let elapsedTime = endTime.timeIntervalSince(start)
+        return elapsedTime
     }
 }

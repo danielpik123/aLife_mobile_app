@@ -16,12 +16,14 @@ class PhotoLoader {
     private(set) var currentIndex: Int = 0
     
     private init() {
-        loadPhotos()
     }
     
     func nextPhoto() -> (UIImage?, String?) {
         currentIndex = (currentIndex + 1) % 10 // Loop through photos
         updatePhotoAtIndex((currentIndex + 8) % 10)
+        while photos[currentIndex] == nil {
+               usleep(100000) // Sleep for 100ms to prevent excessive CPU consumption
+           }
         return (photos[currentIndex] , assets[currentIndex])
     }
     

@@ -14,6 +14,7 @@ class ExplainVC: ViewControllerHandler {
     var outerWindow: UIVisualEffectView
     var innerWindow: UIVisualEffectView
     
+    var titleLabel: UILabel
     var label: UILabel
     var typingWorkItem: DispatchWorkItem?
     var typingFrequency: CGFloat = 0.02
@@ -31,9 +32,14 @@ class ExplainVC: ViewControllerHandler {
     var nextButton: NextButton
     var progressMeter: ProgressMeter
     
+    var  tapGesture: UITapGestureRecognizer
+    var typingTimer: Timer?
+    var finishedPrinting: Bool = false
+    
+    
     var innerFrameAlpha: CGFloat = 0.5
     var outerFrameAlpha: CGFloat = 0.8
-
+    
     
     
     init(view: UIView) {
@@ -49,6 +55,14 @@ class ExplainVC: ViewControllerHandler {
         self.innerWindow.layer.cornerRadius = cornerRadius / 1.5
         self.innerWindow.clipsToBounds = true
         self.innerWindow.translatesAutoresizingMaskIntoConstraints = false
+        
+
+        self.titleLabel = UILabel()
+        self.titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        self.titleLabel.textAlignment = .center
+        self.titleLabel.numberOfLines = 1
+        self.titleLabel.font = UIFont.systemFont(ofSize: UIScreen.main.bounds.height/29,weight: .heavy)
+        self.titleLabel.adjustsFontSizeToFitWidth = true
         
         self.label = UILabel()
         self.label.numberOfLines = 0
@@ -70,9 +84,14 @@ class ExplainVC: ViewControllerHandler {
         
         self.progressMeter = ProgressMeter()
         
-        
+        self.tapGesture = UITapGestureRecognizer()
         self.nextButton = NextButton()
+        
+        self.tapGesture.addTarget(self, action: #selector(didTapInnerWindow))
+        innerWindow.addGestureRecognizer(tapGesture)
+        
         nextButton.addTarget(self, action: #selector(nextButtonPressed), for: .touchUpInside)
+        
         
     }
     
@@ -85,18 +104,29 @@ class ExplainVC: ViewControllerHandler {
         return nil
     }
     
+    func changeZoomToCurrentExplain(){
+        
+    }
+    
+    func labelForStage()-> String {
+        return ""
+    }
+    
+    func advanceToNextVC(){}
+    
     func setupView() {
         view.addSubview(outerWindow)
         view.addSubview(innerWindow)
         view.addSubview(gifView)
+        innerWindow.contentView.addSubview(titleLabel)
         innerWindow.contentView.addSubview(label)
         view.addSubview(nextButton)
         view.addSubview(progressMeter)
         
-        
+        label.textAlignment = .center
         
         NSLayoutConstraint.activate([
-//            outerWindow.topAnchor.constraint(equalTo: view.topAnchor, constant: bottomPadding),
+            //            outerWindow.topAnchor.constraint(equalTo: view.topAnchor, constant: bottomPadding),
             outerWindow.topAnchor.constraint(equalTo: TopBarManager.shared.topBar.bottomAnchor, constant: 2*padding),
             outerWindow.leadingAnchor.constraint(equalTo: view.leadingAnchor, constant: padding*2),
             outerWindow.trailingAnchor.constraint(equalTo: view.trailingAnchor, constant: -padding*2),
@@ -118,14 +148,18 @@ class ExplainVC: ViewControllerHandler {
         gifView.heightAnchor.constraint(equalTo: innerWindow.contentView.widthAnchor, constant: (-4)*padding).isActive = true
         
         NSLayoutConstraint.activate([
-            
-            label.leadingAnchor.constraint(equalTo: innerWindow.contentView.leadingAnchor, constant: 2*padding),
-            label.trailingAnchor.constraint(equalTo: innerWindow.contentView.trailingAnchor, constant: (-2)*padding),
-            label.topAnchor.constraint(equalTo: gifView.bottomAnchor, constant: padding*2),
-            //            label.bottomAnchor.constraint(equalTo: innerWindow.contentView.bottomAnchor, constant: 2*padding),
-            
+            titleLabel.topAnchor.constraint(equalTo: gifView.bottomAnchor, constant: 2*padding),
+            titleLabel.leadingAnchor.constraint(equalTo: innerWindow.contentView.leadingAnchor, constant: 4*padding),
+            titleLabel.trailingAnchor.constraint(equalTo: innerWindow.contentView.trailingAnchor, constant: (-4)*padding)
         ])
         
+        NSLayoutConstraint.activate([
+            label.topAnchor.constraint(equalTo: titleLabel.bottomAnchor, constant: 2*padding),
+            label.leadingAnchor.constraint(equalTo: innerWindow.contentView.leadingAnchor, constant: 2*padding),
+            label.trailingAnchor.constraint(equalTo: innerWindow.contentView.trailingAnchor, constant: (-2)*padding)
+        ])
+        
+       
         NSLayoutConstraint.activate([
             nextButton.centerXAnchor.constraint(equalTo: outerWindow.centerXAnchor),
             nextButton.topAnchor.constraint(equalTo: outerWindow.bottomAnchor, constant: padding*1),
@@ -144,6 +178,7 @@ class ExplainVC: ViewControllerHandler {
     func teardownView() {
         self.typingWorkItem?.cancel() // cancel the work item to stop the typing effect
         self.label.removeFromSuperview()
+        self.titleLabel.removeFromSuperview()
         self.gifView.removeFromSuperview()
         self.innerWindow.removeFromSuperview()
         self.outerWindow.removeFromSuperview()
@@ -157,18 +192,14 @@ class ExplainVC: ViewControllerHandler {
         self.gifView.alpha = 0
         UIView.animate(withDuration: 1, animations: {
             self.gifView.alpha = 1
+            self.titleLabel.alpha = 1
             
         })
         state = state.nextState
         gifView.image = imageForState(state)
         typeText(text: textForState(state)) {
-            // Show the "next" button when the animation finishes
-            self.nextButton.alpha = 0
-            self.nextButton.isHidden = false
-            UIView.animate(withDuration: 1, animations: {
-                self.nextButton.alpha = 1
-            })
-            
+            self.finishedPrinting = true
+            self.animateNextButton()
         }
         // Hide the "next" button while the animation is playing
         nextButton.isHidden = true
@@ -178,7 +209,8 @@ class ExplainVC: ViewControllerHandler {
     func executeLogic() {
         // Add your logic here
         print("Starting logic of WindowVC")
-        Background.shared.changeZoom(newScale: 2, newX: 200, newY: 60, duration: 1)
+        titleLabel.text = labelForStage()
+        changeZoomToCurrentExplain()
         UIView.animate(withDuration: 1, animations: { [self] in
             innerWindow.alpha = innerFrameAlpha
             outerWindow.alpha = outerFrameAlpha
@@ -198,7 +230,7 @@ class ExplainVC: ViewControllerHandler {
                 self.outerWindow.alpha = 0
                 self.progressMeter.alpha = 0
             }, completion: { _ in
-                self.delegate?.handler(self, didFinishWithTransitionTo: InfoVC.self)
+                self.advanceToNextVC()
             })
             
         }else{
@@ -207,6 +239,7 @@ class ExplainVC: ViewControllerHandler {
         UIView.animate(withDuration: 1, animations: {
             self.nextButton.alpha = 0
             self.gifView.alpha = 0
+            self.titleLabel.alpha = 0.3
             self.label.alpha = 0
             
         }, completion: { _ in
@@ -215,6 +248,7 @@ class ExplainVC: ViewControllerHandler {
     }
     
     func typeText(text: String, completion: @escaping () -> Void) {
+        finishedPrinting  = false
         let paragraphStyle = NSMutableParagraphStyle()
         paragraphStyle.lineHeightMultiple = 0.01
         
@@ -226,7 +260,7 @@ class ExplainVC: ViewControllerHandler {
         var characterIndex = 0
         var delay: CGFloat = 0.0
         
-        Timer.scheduledTimer(withTimeInterval: Double(typingFrequency), repeats: true) { [self] timer in
+        typingTimer = Timer.scheduledTimer(withTimeInterval: Double(typingFrequency), repeats: true) { [self] timer in
             guard characterIndex < text.count else {
                 timer.invalidate()
                 completion()
@@ -249,8 +283,27 @@ class ExplainVC: ViewControllerHandler {
             timer.fireDate = Date().addingTimeInterval(Double(typingFrequency + delay))
             characterIndex += 1
         }
+        
     }
     
+    @objc func didTapInnerWindow() {
+        if finishedPrinting {
+            return
+        }
+        finishedPrinting = true
+        typingTimer?.invalidate()  // Stop the timer
+        label.text = textForState(state)  // Set the label text to the full text for the current state
+        
+        animateNextButton()
+    }
+    
+    private func animateNextButton(){
+        self.nextButton.alpha = 0
+        self.nextButton.isHidden = false
+        UIView.animate(withDuration: 0.5, animations: {
+            self.nextButton.alpha = 1
+        })
+    }
 }
 
 
@@ -260,28 +313,6 @@ enum State {
     case stage2
     case stage3
     case finished
-    
-//    var image: UIImage? {
-//        switch self {
-//        case .stage0: return nil
-//        case .stage1: return UIImage(named: "seaOfData")
-//        case .stage2: return UIImage(named: "beacon")
-//        case .stage3: return UIImage(named: "photoObjects")
-//        case .finished: return nil
-//        }
-//    }
-//
-//    var text: String {
-//        switch self {
-//        case.stage0: return ""
-//        case .stage1: return "In an age where personal data is the new currency, our every move is carefully recorded, updated, and studied. Those who dive into this vast ocean of information claim to know our desires, but more often than not, their economic interests take precedence over our true needs. "
-//
-//        case .stage2: return "Enter reCollect, your beacon in this sea of data exploration. We're pioneering a different kind of research, one that delves into the heart of what truly matters in human experiences. "
-//
-//        case .stage3: return "Ever wonder why some moments urge you to reach for your mobile device, while others pass unnoticed? With reCollect, we ponder this enigma. We believe that in the midst of countless daily experiences, the moments you choose to capture hold profound significance. Let's delve into that together! "
-//        case .finished: return ""
-//        }
-//    }
     
     var nextState: State {
         switch self {
